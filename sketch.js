@@ -117,22 +117,20 @@ function setDepthColor(depth){
 
 
 let counter = 0;
-let depth = 0;
 let layer_colors = {}
 async function drawBranch(nodes, depth) {
   nodes.forEach((k,i) => {
     if(counter < 100) {
       if(!layer_colors[depth]) layer_colors[depth] = [getC(), getC(), getC()]
-      console.log(i)
       color = layer_colors[depth];
+      console.log(i, color)
       strokeWeight(1)
       rectMode(CORNERS)
       strokeWeight(2 - depth/1.5)
       fill(color[0], color[1], color[2], 100)
       rect(k.minX, k.minY, k.maxX, k.maxY)
       if(k.children) {
-        depth++;
-        drawBranch(k.children, depth)
+        drawBranch(k.children, depth+1)
       }
     }
   })
