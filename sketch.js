@@ -1,9 +1,9 @@
 var region_data;
-const scaler = 4000;
+const scaler = 1200;
 
 function preload() {
   region_data = new Promise(async (resolve, reject) => {
-    let data = await fetch("data/regmm.geojson");
+    let data = await fetch("data/communes.geojson");
     let meta = await data.json();
     const region_polygons = {};
     result = meta.features.map((e) => {
@@ -30,11 +30,11 @@ var data;
 var borders = [];
 async function setup() {
   data = await region_data;
-  console.log(data);
-  createCanvas(800, 800);
+  // console.log(data);
+  createCanvas(1600, 1600);
 }
 
-function extractSequences(region) {
+function extractSequences(region, disable_border) {
   let border;
   let coordinates = region.polygons.map((e) => {
     border = {
@@ -55,7 +55,7 @@ function extractSequences(region) {
 
     return maped;
   });
-  borders.push(border);
+  if(!disable_border) borders.push(border);
   let double_b  = Object.assign({}, border);
   double_b.minX = double_b.minX + 100;
   double_b.maxX = double_b.maxX + 100;
@@ -82,7 +82,7 @@ function setRandomStroke(salt) {
 }
 
 function startNode(tree) {
-  console.log("test",tree)
+  // console.log("test",tree)
   const nodes = tree.data.children;
   // DRAW CCHILDREN TREE
   newcolor = [getC(), getC(), getC()]
@@ -123,10 +123,10 @@ async function drawBranch(nodes, depth) {
     if(counter < 100) {
       if(!layer_colors[depth]) layer_colors[depth] = [getC(), getC(), getC()]
       color = layer_colors[depth];
-      console.log(i, color)
+      // console.log(i, color)
       strokeWeight(1)
       rectMode(CORNERS)
-      strokeWeight(2 - depth/1.5)
+      strokeWeight(2 - depth/3)
       fill(color[0], color[1], color[2], 100)
       rect(k.minX, k.minY, k.maxX, k.maxY)
       if(k.children) {
@@ -141,9 +141,10 @@ function drawBox() {}
 var drawed = false;
 function draw() {
   scale(1, -1);
-  translate(300, -height + 400);
+  translate(700, -height + 1050);
   let boxes = [];
   if (data && !drawed) {
+    background(255)
     data.forEach((region) => {
       // Draw Borders
       sequences = extractSequences(region);
@@ -174,6 +175,15 @@ function draw() {
     //   rect(border.minX, border.minY, border.maxX, border.maxY)
     // })
     drawed = true;
+    data.forEach((region) => {
+      // Draw Borders
+      sequences = extractSequences(region, true);
+      sequences.forEach((sequence) => {
+        drawSequence(sequence);
+      });
+
+      // Draw Boxes
+    });
   }
 }
 
